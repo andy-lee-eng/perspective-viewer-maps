@@ -1,0 +1,4 @@
+node_modules
+
+# Visual Studio Code configuration
+/jsconfig.json

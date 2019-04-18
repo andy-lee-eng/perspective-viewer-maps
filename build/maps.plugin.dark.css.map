@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://perspective-viewer-maps/./src/themes/material.dark.less"],"names":[],"mappings":"AAAA;AACA;AACA","file":"maps.plugin.dark.css","sourcesContent":["perspective-viewer {\n  --myplugin-background: #323232;\n}\n"],"sourceRoot":""}
