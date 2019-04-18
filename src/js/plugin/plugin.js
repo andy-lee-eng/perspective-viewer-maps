@@ -40,6 +40,10 @@ function drawView(viewEntryPoint) {
             return;
         }
 
+        if (!config.row_pivot) config.row_pivot = config.row_pivots;
+        if (!config.column_pivot) config.column_pivot = config.column_pivots;
+        if (!config.aggregate) config.aggregate = config.aggregates;
+
         getElement.call(this, el).render(viewEntryPoint, Object.assign({schema, tschema, data}, config));
     };
 }
