@@ -15,9 +15,9 @@ const {fromLonLat} = ol.proj;
 const {Circle} = ol.geom;
 const {Style, Fill, Stroke} = ol.style;
 
-const MIN_SIZE = 2000;
-const MAX_SIZE = 20000;
-const DEFAULT_SIZE = 5000;
+const MIN_RATIO = 0.002;
+const MAX_RATIO = 0.02;
+const DEFAULT_RATIO = 0.005;
 
 const PRIVATE = Symbol("map-view-data");
 
@@ -67,12 +67,17 @@ function colorMapFromCategories(data) {
 }
 
 function sizeMapFromExtents(extents) {
+    const pExtents = [fromLonLat([extents[0].min, extents[1].min]), fromLonLat([extents[0].max, extents[1].max])];
+    const mapSize = Math.min(pExtents[1][0] - pExtents[0][0], pExtents[1][1] - pExtents[0][1]);
     if (extents.length > 2) {
+        const max_size = MAX_RATIO * mapSize;
+        const min_size = MIN_RATIO * mapSize;
+
         // We have the size value
         const range = extents[2].max - extents[2].min;
-        return point => ((point.cols[2] - extents[2].min) / range) * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
+        return point => ((point.cols[2] - extents[2].min) / range) * (max_size - min_size) + min_size;
     }
-    return () => DEFAULT_SIZE;
+    return () => DEFAULT_RATIO * mapSize;
 }
 
 function getMapData(config) {
