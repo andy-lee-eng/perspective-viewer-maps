@@ -6,13 +6,14 @@
  * the Apache License 2.0.  The full license can be found in the LICENSE file.
  *
  */
-import {Map, View} from "ol";
-import {Tile as TileLayer, Vector as VectorLayer} from "ol/layer";
-import {OSM, Vector as VectorSource} from "ol/source";
-import {fromLonLat} from "ol/proj";
-import {Circle} from "ol/geom";
-import Feature from "ol/Feature";
-import {Style, Fill, Stroke} from "ol/style";
+
+const ol = window.ol;
+const {Map, View, Feature} = ol;
+const {Tile: TileLayer, Vector: VectorLayer} = ol.layer;
+const {OSM, Vector: VectorSource} = ol.source;
+const {fromLonLat} = ol.proj;
+const {Circle} = ol.geom;
+const {Style, Fill, Stroke} = ol.style;
 
 const MIN_SIZE = 2000;
 const MAX_SIZE = 20000;
@@ -137,8 +138,7 @@ function getOrCreateMap(container, extents) {
         const map = new Map({
             target: container,
             layers: [new TileLayer({source: new OSM()}), new VectorLayer({source: vectorSource})],
-            view: new View({center, resolution}),
-            projection: ""
+            view: new View({center, resolution})
         });
         container[PRIVATE] = {map, vectorSource};
     }
