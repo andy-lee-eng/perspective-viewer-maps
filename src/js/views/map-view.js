@@ -150,11 +150,12 @@ function getOrCreateMap(container, extents) {
         const resolution = Math.max(Math.abs(pExtents[1][0] - pExtents[0][0]) / size.width, Math.abs(pExtents[1][1] - pExtents[0][1]) / size.height);
 
         const vectorSource = new VectorSource({
-            features: []
+            features: [],
+            wrapX: false
         });
         const map = new Map({
             target: container,
-            layers: [new TileLayer({source: new OSM()}), new VectorLayer({source: vectorSource})],
+            layers: [new TileLayer({source: new OSM({wrapX: false})}), new VectorLayer({source: vectorSource})],
             view: new View({center, resolution})
         });
         const tooltip = createTooltip(container, map);
