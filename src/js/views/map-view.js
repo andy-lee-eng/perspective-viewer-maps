@@ -7,6 +7,8 @@
  *
  */
 
+import {createTooltip} from "../tooltip/tooltip";
+
 const ol = window.ol;
 const {Map, View, Feature} = ol;
 const {Tile: TileLayer, Vector: VectorLayer} = ol.layer;
@@ -34,7 +36,16 @@ function mapView(container, config) {
 
     map.vectorSource.clear();
     map.vectorSource.addFeatures(data.map(point => featureFromPoint(point, colorMap, sizeMap)));
+
+    // Update the tooltip component
+    map.tooltip.config(config).data(data);
 }
+
+mapView.resize = container => {
+    if (container[PRIVATE]) {
+        container[PRIVATE].map.updateSize();
+    }
+};
 
 function featureFromPoint(point, colorMap, sizeMap) {
     const feature = new Feature(new Circle(fromLonLat(point.cols), sizeMap(point)));
@@ -90,7 +101,7 @@ function getMapData(config) {
         if (groupCount < config.row_pivot.length) return;
 
         // Get the group from the row path
-        const group = row.__ROW_PATH__ ? row.__ROW_PATH__.join(",") : `${i}`;
+        const group = row.__ROW_PATH__ ? row.__ROW_PATH__.join("|") : `${i}`;
         const rowPoints = {};
 
         // Split the rest of the row into a point for each category
@@ -98,8 +109,8 @@ function getMapData(config) {
             .filter(key => key !== "__ROW_PATH__" && row[key] !== null)
             .forEach(key => {
                 const split = key.split("|");
-                const category = split.length > 1 ? split.slice(0, split.length - 1).join(",") : "__default__";
-                rowPoints[category] = rowPoints[category] || {group};
+                const category = split.length > 1 ? split.slice(0, split.length - 1).join("|") : "__default__";
+                rowPoints[category] = rowPoints[category] || {group, row};
                 rowPoints[category][split[split.length - 1]] = row[key];
             });
 
@@ -110,6 +121,7 @@ function getMapData(config) {
             points.push({
                 cols,
                 group: rowPoint.group,
+                row: rowPoint.row,
                 category: key
             });
         });
@@ -145,7 +157,8 @@ function getOrCreateMap(container, extents) {
             layers: [new TileLayer({source: new OSM()}), new VectorLayer({source: vectorSource})],
             view: new View({center, resolution})
         });
-        container[PRIVATE] = {map, vectorSource};
+        const tooltip = createTooltip(container, map);
+        container[PRIVATE] = {map, vectorSource, tooltip};
     }
 
     return container[PRIVATE];

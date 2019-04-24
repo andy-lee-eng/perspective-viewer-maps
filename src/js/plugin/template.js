@@ -20,6 +20,7 @@ class TemplateElement extends HTMLElement {
 
         // Serialised user settings for this plugin
         this._settings = {};
+        this._view = null;
     }
 
     connectedCallback() {
@@ -27,11 +28,15 @@ class TemplateElement extends HTMLElement {
     }
 
     render(view, config) {
+        this._view = view;
         view(this._container, config, this._settings);
     }
 
     resize() {
         // Called by perspective-viewer when the container is resized
+        if (this._view && this._view.resize) {
+            this._view.resize(this._container);
+        }
     }
 
     getSettings() {

@@ -48,7 +48,7 @@
 
 <body>
 
-    <perspective-viewer class="example" view="map_view" columns='["longitude","latitude"]'
+    <perspective-viewer class="example" view="map_view" row-pivots='["name"]' columns='["longitude","latitude"]'
         aggregates='{"latitude":"avg","longitude":"avg"}'>
 
     </perspective-viewer>
@@ -63,6 +63,12 @@
             }
             xhr.send(null);
         });
+
+
+        document.querySelector('.example')
+            .addEventListener("perspective-click", function(event) {
+                console.log("Event from map", event.detail);
+            });
     </script>
     <script src="theme-toggle.js"></script>
 
