@@ -9,11 +9,14 @@
 
 const ol = window.ol;
 const {fromLonLat} = ol.proj;
+const {Style, Fill, Stroke} = ol.style;
 
 export function createTooltip(container, map) {
     let data = null;
     let config = null;
     let currentPoint = null;
+    let currentFeature = null;
+    let featureStyle = null;
 
     map.on("pointermove", evt => {
         if (!evt.dragging) {
@@ -67,6 +70,7 @@ export function createTooltip(container, map) {
 
         if (currentPoint !== closest.point) {
             currentPoint = closest.point;
+            highlighFeature(screen, closest.position);
 
             tooltipDiv.innerHTML = composeHtml(currentPoint);
             tooltipDiv.style.left = `${screen[0]}px`;
@@ -75,9 +79,41 @@ export function createTooltip(container, map) {
         }
     };
 
+    const highlighFeature = (screen, coordinate) => {
+        restoreFeature();
+        map.forEachFeatureAtPixel(screen, feature => {
+            const geometry = feature.getGeometry();
+            if (geometry.getCenter && distanceBetween(geometry.getCenter(), coordinate) == 0) {
+                currentFeature = feature;
+            }
+        });
+
+        if (currentFeature) {
+            featureStyle = currentFeature.getStyle();
+            const color = featureStyle.getStroke().getColor();
+
+            currentFeature.setStyle(
+                new Style({
+                    stroke: new Stroke({color: lightenRgb(color, 0.25)}),
+                    fill: new Fill({color: lightenRgb(color, 0.5)}),
+                    zIndex: 10
+                })
+            );
+        }
+    };
+
+    const restoreFeature = () => {
+        if (currentFeature && featureStyle) {
+            currentFeature.setStyle(featureStyle);
+        }
+        currentFeature = null;
+        featureStyle = null;
+    };
+
     const onLeave = () => {
         tooltipDiv.className = "map-tooltip";
         currentPoint = null;
+        restoreFeature();
     };
 
     const onClick = () => {
@@ -102,11 +138,17 @@ export function createTooltip(container, map) {
     };
 
     const composeHtml = point => {
-        const group = point.group ? composeGroup(point.group) : "";
+        const group = composeGroup(point.group);
+        const aggregates = composeAggregates(point.cols);
         const category = composeCategory(point.category);
         const location = composeLocation(point.cols);
 
-        return `${group}${category}${location}`;
+        return `${group}${aggregates}${category}${location}`;
+    };
+
+    const composeAggregates = cols => {
+        const list = config.aggregate.slice(2).map((a, i) => ({name: a.column, value: cols[i + 2]}));
+        return composeList(list);
     };
 
     const composeGroup = group => {
@@ -130,7 +172,7 @@ export function createTooltip(container, map) {
     };
 
     const getFilter = list => {
-        return list.map(item => ([item.name, "==", item.value]));
+        return list.map(item => [item.name, "==", item.value]);
     };
 
     const composeList = items => {
@@ -152,6 +194,16 @@ export function createTooltip(container, map) {
 
     const distanceBetween = (c1, c2) => {
         return Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2));
+    };
+
+    const lightenRgb = (color, lighten) => {
+        const colors = color
+            .substring(color.indexOf("(") + 1)
+            .split(",")
+            .map(c => parseInt(c));
+
+        const up = c => Math.floor(c + (255 - c) * lighten);
+        return `rgb(${colors.map(up).join(",")})`;
     };
 
     return _tooltip;
