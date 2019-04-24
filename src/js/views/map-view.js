@@ -14,12 +14,12 @@ const {Map, View, Feature} = ol;
 const {Tile: TileLayer, Vector: VectorLayer} = ol.layer;
 const {OSM, Vector: VectorSource} = ol.source;
 const {fromLonLat} = ol.proj;
-const {Circle} = ol.geom;
-const {Style, Fill, Stroke} = ol.style;
+const {Point} = ol.geom;
+const {Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
 
-const MIN_RATIO = 0.002;
-const MAX_RATIO = 0.02;
-const DEFAULT_RATIO = 0.005;
+const MIN_SIZE = 2;
+const MAX_SIZE = 20;
+const DEFAULT_SIZE = 5;
 
 const PRIVATE = Symbol("map-view-data");
 
@@ -48,15 +48,15 @@ mapView.resize = container => {
 };
 
 function featureFromPoint(point, colorMap, sizeMap) {
-    const feature = new Feature(new Circle(fromLonLat(point.cols), sizeMap(point)));
+    const feature = new Feature(new Point(fromLonLat(point.cols)));
 
-    const color = colorMap(point).join(",");
-    feature.setStyle(
-        new Style({
-            stroke: new Stroke({color: `rgb(${color})`}),
-            fill: new Fill({color: `rgba(${color}, 0.5)`})
-        })
-    );
+    const rgb = colorMap(point).join(",");
+    const style = new CircleStyle({
+        stroke: new Stroke({color: `rgb(${rgb})`}),
+        fill: new Fill({color: `rgba(${rgb}, 0.5)`}),
+        radius: sizeMap(point)
+    });
+    feature.setStyle(new Style({image: style}));
     return feature;
 }
 
@@ -78,17 +78,12 @@ function colorMapFromCategories(data) {
 }
 
 function sizeMapFromExtents(extents) {
-    const pExtents = [fromLonLat([extents[0].min, extents[1].min]), fromLonLat([extents[0].max, extents[1].max])];
-    const mapSize = Math.min(pExtents[1][0] - pExtents[0][0], pExtents[1][1] - pExtents[0][1]);
     if (extents.length > 2) {
-        const max_size = MAX_RATIO * mapSize;
-        const min_size = MIN_RATIO * mapSize;
-
         // We have the size value
         const range = extents[2].max - extents[2].min;
-        return point => ((point.cols[2] - extents[2].min) / range) * (max_size - min_size) + min_size;
+        return point => ((point.cols[2] - extents[2].min) / range) * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
     }
-    return () => DEFAULT_RATIO * mapSize;
+    return () => DEFAULT_SIZE;
 }
 
 function getMapData(config) {
@@ -158,7 +153,7 @@ function getOrCreateMap(container, extents) {
             layers: [new TileLayer({source: new OSM({wrapX: false})}), new VectorLayer({source: vectorSource})],
             view: new View({center, resolution})
         });
-        const tooltip = createTooltip(container, map);
+        const tooltip = createTooltip(container, map, vectorSource);
         container[PRIVATE] = {map, vectorSource, tooltip};
     }
 

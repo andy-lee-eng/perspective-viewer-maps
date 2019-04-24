@@ -9,9 +9,9 @@
 
 const ol = window.ol;
 const {fromLonLat} = ol.proj;
-const {Style, Fill, Stroke} = ol.style;
+const {Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
 
-export function createTooltip(container, map) {
+export function createTooltip(container, map, vectorSource) {
     let data = null;
     let config = null;
     let currentPoint = null;
@@ -70,7 +70,7 @@ export function createTooltip(container, map) {
 
         if (currentPoint !== closest.point) {
             currentPoint = closest.point;
-            highlighFeature(screen, closest.position);
+            highlighFeature(closest.position);
 
             tooltipDiv.innerHTML = composeHtml(currentPoint);
             tooltipDiv.style.left = `${screen[0]}px`;
@@ -79,26 +79,22 @@ export function createTooltip(container, map) {
         }
     };
 
-    const highlighFeature = (screen, coordinate) => {
+    const highlighFeature = coordinate => {
         restoreFeature();
-        map.forEachFeatureAtPixel(screen, feature => {
-            const geometry = feature.getGeometry();
-            if (geometry.getCenter && distanceBetween(geometry.getCenter(), coordinate) == 0) {
-                currentFeature = feature;
-            }
-        });
+        currentFeature = vectorSource.getClosestFeatureToCoordinate(coordinate);
 
         if (currentFeature) {
             featureStyle = currentFeature.getStyle();
-            const color = featureStyle.getStroke().getColor();
+            const imageStyle = featureStyle.getImage();
+            const color = imageStyle.getStroke().getColor();
+            const radius = imageStyle.getRadius();
 
-            currentFeature.setStyle(
-                new Style({
-                    stroke: new Stroke({color: lightenRgb(color, 0.25)}),
-                    fill: new Fill({color: lightenRgb(color, 0.5)}),
-                    zIndex: 10
-                })
-            );
+            const newStyle = new CircleStyle({
+                stroke: new Stroke({color: lightenRgb(color, 0.25)}),
+                fill: new Fill({color: lightenRgb(color, 0.5)}),
+                radius
+            });
+            currentFeature.setStyle(new Style({image: newStyle, zIndex: 10}));
         }
     };
 
