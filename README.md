@@ -31,8 +31,16 @@ The plugin includes a dark-theme file `maps.plugin.dark.css`, with some default 
 ```
   <style>
     perspective-viewer {
+
+      // Change the first 2 categories to red and green
       --map-category-1: #ff0000;
+      --map-category-2: #00ff00;
+
+      // Change the color gradient to blue-grey-red
       --map-gradient: linear-gradient(#0000ff 0%, #a0a0a0 50%, #ff0000 100%);
+
+      // Change the source url for the map tiles
+      --map-tile-url: "http://{a-c}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
     }
   </style>
 ```

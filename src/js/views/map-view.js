@@ -11,6 +11,7 @@ import {createTooltip} from "../tooltip/tooltip";
 import {categoryColorMap} from "../style/categoryColors";
 import {linearColorScale} from "../style/linearColors";
 import {showLegend, hideLegend} from "../legend/legend";
+import {computedStyle} from "../style/computed";
 
 const ol = window.ol;
 const {Map, View, Feature} = ol;
@@ -23,6 +24,7 @@ const {Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
 const MIN_SIZE = 2;
 const MAX_SIZE = 20;
 const DEFAULT_SIZE = 5;
+const DEFAULT_TILE_URL = '"http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"';
 
 const PRIVATE = Symbol("map-view-data");
 
@@ -32,6 +34,8 @@ function mapView(container, config) {
     const extents = getDataExtents(data);
 
     const map = getOrCreateMap(container, extents);
+    setTileUrl(container);
+
     const useLinearColors = extents.length > 2;
     const colorScale = useLinearColors ? linearColorScale(container, extents[2]) : null;
     const colorMap = useLinearColors ? d => colorScale(d.cols[2]) : categoryColorMap(container, data);
@@ -139,20 +143,34 @@ function getOrCreateMap(container, extents) {
         const center = [(pExtents[0][0] + pExtents[1][0]) / 2, (pExtents[0][1] + pExtents[1][1]) / 2];
         const resolution = Math.max(Math.abs(pExtents[1][0] - pExtents[0][0]) / size.width, Math.abs(pExtents[1][1] - pExtents[0][1]) / size.height);
 
+        const tileLayer = new TileLayer();
         const vectorSource = new VectorSource({
             features: [],
             wrapX: false
         });
+        const vectorLayer = new VectorLayer({source: vectorSource});
+
         const map = new Map({
             target: container,
-            layers: [new TileLayer({source: new OSM({wrapX: false})}), new VectorLayer({source: vectorSource})],
+            layers: [tileLayer, vectorLayer],
             view: new View({center, resolution})
         });
+
         const tooltip = createTooltip(container, map, vectorSource);
-        container[PRIVATE] = {map, vectorSource, tooltip};
+        container[PRIVATE] = {map, vectorSource, tooltip, tileLayer, vectorLayer};
     }
 
     return container[PRIVATE];
+}
+
+function setTileUrl(container) {
+    const tileUrl = computedStyle(container)("--map-tile-url", DEFAULT_TILE_URL);
+    const url = tileUrl.substring(1, tileUrl.length - 1);
+
+    if (container[PRIVATE].tileUrl != url) {
+        container[PRIVATE].tileLayer.setSource(new OSM({wrapX: false, url}));
+        container[PRIVATE].tileUrl = url;
+    }
 }
 
 mapView.plugin = {

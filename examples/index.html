@@ -43,13 +43,19 @@
         }
     </style>
 
+    <style>
+        perspective-viewer {
+            --map-tile-url: "http://{a-c}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+        }
+    </style>
+
     <title>Perspective Test</title>
 </head>
 
 <body>
 
-    <perspective-viewer class="example" view="map_view" row-pivots='["name"]' columns='["longitude","latitude"]'
-        aggregates='{"latitude":"avg","longitude":"avg"}'>
+    <perspective-viewer class="example" view="map_view" row-pivots='["name"]' columns='["longitude","latitude", "elevation"]'
+        aggregates='{"latitude":"avg","longitude":"avg","elevation":"avg"}' filters='[["elevation",">",0]]'>
 
     </perspective-viewer>
 
