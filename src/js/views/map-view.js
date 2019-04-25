@@ -8,6 +8,8 @@
  */
 
 import {createTooltip} from "../tooltip/tooltip";
+import {categoryColorMap} from "../style/categoryColors";
+import {linearColorMap} from "../style/linearColors";
 
 const ol = window.ol;
 const {Map, View, Feature} = ol;
@@ -23,15 +25,13 @@ const DEFAULT_SIZE = 5;
 
 const PRIVATE = Symbol("map-view-data");
 
-const CATEGORY_COLORS = ["1f77b4", "0366d6", "ff7f0e", "2ca02c", "d62728", "9467bd", "8c564b", "e377c2", "7f7f7f", "bcbd22", "17becf"];
-
 function mapView(container, config) {
     // Render the view of this data
     const data = getMapData(config);
     const extents = getDataExtents(data);
 
     const map = getOrCreateMap(container, extents);
-    const colorMap = colorMapFromCategories(data);
+    const colorMap = extents.length > 2 ? linearColorMap(container, extents[2]) : categoryColorMap(container, data);
     const sizeMap = sizeMapFromExtents(extents);
 
     map.vectorSource.clear();
@@ -60,28 +60,11 @@ function featureFromPoint(point, colorMap, sizeMap) {
     return feature;
 }
 
-function colorMapFromCategories(data) {
-    let colIndex = 0;
-    const categories = {};
-
-    data.forEach(point => {
-        if (!categories[point.category]) {
-            const col = CATEGORY_COLORS[colIndex];
-            categories[point.category] = [col.substring(0, 2), col.substring(2, 4), col.substring(4, 6)].map(c => parseInt(c, 16));
-
-            colIndex++;
-            if (colIndex >= CATEGORY_COLORS.length) colIndex = 0;
-        }
-    });
-
-    return point => categories[point.category];
-}
-
 function sizeMapFromExtents(extents) {
-    if (extents.length > 2) {
+    if (extents.length > 3) {
         // We have the size value
-        const range = extents[2].max - extents[2].min;
-        return point => ((point.cols[2] - extents[2].min) / range) * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
+        const range = extents[3].max - extents[3].min;
+        return point => ((point.cols[3] - extents[3].min) / range) * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
     }
     return () => DEFAULT_SIZE;
 }
@@ -167,7 +150,7 @@ mapView.plugin = {
     initial: {
         type: "number",
         count: 2,
-        names: ["Longitude", "Latitude", "Size"]
+        names: ["Longitude", "Latitude", "Color", "Size"]
     }
 };
 export default mapView;
