@@ -40,6 +40,13 @@ export function showLegend(container, colorScale, extent) {
         .attr("y1", d => (d * height) / 100)
         .attr("y2", d => (d * height) / 100)
         .attr("stroke", d => `rgb(${colorScale(((100 - d) * (extent.max - extent.min)) / 100 + extent.min)})`);
+
+    let maxLabelWidth = 0;
+    legend.selectAll(".map-legend-axis .tick text").each((d, i, node) => {
+        maxLabelWidth = Math.max(maxLabelWidth, node[i].getBBox().width);
+    });
+
+    legend.style("width", `${maxLabelWidth + 37}px`);
 }
 
 export function hideLegend(container) {
