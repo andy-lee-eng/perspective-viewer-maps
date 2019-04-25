@@ -20,7 +20,9 @@ export function showLegend(container, colorScale, extent) {
         .nice();
 
     // axis
-    const axis = axisRight(scale).tickSize(15);
+    const axis = axisRight(scale)
+        .tickSize(15)
+        .tickArguments([5]);
     legend.select(".map-legend-axis").call(axis);
 
     // color bar
