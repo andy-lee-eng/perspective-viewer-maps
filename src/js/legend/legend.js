@@ -7,10 +7,7 @@
  *
  */
 
-import {select} from "d3-selection";
-import {axisRight} from "d3-axis";
-import {scaleLinear} from "d3-scale";
-import {range} from "d3-array";
+import {select, axisRight, scaleLinear, range} from "d3";
 
 const height = 100;
 

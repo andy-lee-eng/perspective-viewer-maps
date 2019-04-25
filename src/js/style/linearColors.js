@@ -6,11 +6,10 @@
  * the Apache License 2.0.  The full license can be found in the LICENSE file.
  *
  */
-import {interpolate} from "d3-interpolate";
-import {scaleSequential} from "d3-scale";
+import * as gparser from "gradient-parser";
+import {interpolate, scaleSequential} from "d3";
 
 import {computedStyle, asRgb} from "./computed";
-import * as gparser from "gradient-parser";
 
 const GRADIENT_COLOR_VAR = "--map-gradient";
 const GRADIENT_DEFAULT = "linear-gradient(#4d342f 0%, #e4521b 22.5%, #decb45 42.5%, #a0a0a0 50%, #bccda8 57.5%, #42b3d5 67.5%, #1a237e 100%)";

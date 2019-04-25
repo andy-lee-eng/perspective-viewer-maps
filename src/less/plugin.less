@@ -18,9 +18,6 @@
         bottom: 0;
         overflow: hidden;
 
-        // example using themes
-        background: var(--myplugin-background, rgb(250, 250, 250));
-
         & .ol-zoom {
             left: auto;
             top: 4em;
@@ -30,7 +27,7 @@
         & .map-tooltip {
             position: absolute;
             display: none;
-            background: #eee;
+            background: var(--map-element-background, #eee);
             border: 1px solid #888;
             border-radius: 5px;
             padding: 5px;
@@ -71,7 +68,7 @@
             right: 0.75em;
             width: 80px;
             height: 125px;
-            background: #eee;
+            background: var(--map-element-background, #eee);
             border-radius: 5px;
             pointer-events: none;
             opacity: 0.8;
@@ -82,7 +79,7 @@
             }
 
             & .tick line {
-                color: #eee;
+                color: var(--map-element-background, #eee);
             }
         }
     }

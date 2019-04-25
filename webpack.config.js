@@ -8,7 +8,7 @@
  */
 
 const path = require("path");
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const pkg = require("./package.json");
@@ -26,42 +26,29 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                loader: 'babel-loader'
+                loader: "babel-loader"
             },
             {
                 test: /\.html$/,
-                loader: 'html-loader'
+                loader: "html-loader"
             },
             {
                 test: /\.less$/,
-                include: [
-                    path.resolve(__dirname, "src/less")
-                ],
-                use: [
-                    { loader: 'css-loader' },
-                    { loader: 'less-loader' }
-                ]
+                include: [path.resolve(__dirname, "src/less")],
+                use: [{loader: "css-loader"}, {loader: "less-loader"}]
             },
             {
                 test: /\.less$/,
-                include: [
-                    path.resolve(__dirname, "src/themes")
-                ],
-                use: [
-                    { loader: MiniCssExtractPlugin.loader },
-                    { loader: 'css-loader' },
-                    { loader: 'less-loader' }
-                ]
+                include: [path.resolve(__dirname, "src/themes")],
+                use: [{loader: MiniCssExtractPlugin.loader}, {loader: "css-loader"}, {loader: "less-loader"}]
             }
         ]
     },
-    plugins: [
-        new MiniCssExtractPlugin({ filename: `${name}.plugin.dark.css` })
-    ],
+    plugins: [new MiniCssExtractPlugin({filename: `${name}.plugin.dark.css`})],
     optimization: {
         minimizer: [
             new UglifyJSPlugin({
-                uglifyOptions: { sourceMap: true, mangle: false }
+                uglifyOptions: {sourceMap: true, mangle: false}
             })
         ]
     },
@@ -72,15 +59,15 @@ module.exports = {
         path: path.join(__dirname, "build")
     },
     devServer: {
-      contentBase: [
-        path.join(__dirname, 'examples'),
-        path.resolve(__dirname, "node_modules/@jpmorganchase/perspective/build"),
-        path.resolve(__dirname, "node_modules/@jpmorganchase/perspective-viewer/build"),
-        path.resolve(__dirname, "node_modules/@jpmorganchase/perspective-viewer-highcharts/build"),
-        path.resolve(__dirname, "node_modules/@jpmorganchase/perspective-viewer-hypergrid/build"),
-        path.resolve(__dirname, "node_modules/@jpmorganchase/perspective-viewer-d3fc/build")
-      ],
-      proxy: {
+        contentBase: [
+            path.join(__dirname, "examples"),
+            path.resolve(__dirname, "node_modules/@jpmorganchase/perspective/build"),
+            path.resolve(__dirname, "node_modules/@jpmorganchase/perspective-viewer/build"),
+            path.resolve(__dirname, "node_modules/@jpmorganchase/perspective-viewer-highcharts/build"),
+            path.resolve(__dirname, "node_modules/@jpmorganchase/perspective-viewer-hypergrid/build"),
+            path.resolve(__dirname, "node_modules/@jpmorganchase/perspective-viewer-d3fc/build")
+        ],
+        proxy: {
             "/template.plugin.js": {
                 target: `http://localhost:8080/${name}.plugin.js`,
                 ignorePath: true
@@ -89,6 +76,6 @@ module.exports = {
                 target: `http://localhost:8080/${name}.plugin.dark.css`,
                 ignorePath: true
             }
-      }
+        }
     }
 };

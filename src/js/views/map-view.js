@@ -10,7 +10,6 @@
 import {createTooltip} from "../tooltip/tooltip";
 import {categoryColorMap} from "../style/categoryColors";
 import {linearColorScale} from "../style/linearColors";
-
 import {showLegend, hideLegend} from "../legend/legend";
 
 const ol = window.ol;
