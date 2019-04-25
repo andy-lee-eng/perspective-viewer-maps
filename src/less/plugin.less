@@ -23,8 +23,8 @@
 
         & .ol-zoom {
             left: auto;
-            top: 2em;
-            right: 0.5em;
+            top: 4em;
+            left: 0.5em;
         }
 
         & .map-tooltip {
@@ -61,6 +61,28 @@
                     font-weight: bold;
                     margin-right: 1em;
                 }
+            }
+        }
+
+        & .map-legend {
+            position: absolute;
+            box-sizing: border-box;
+            top: 3em;
+            right: 0.75em;
+            width: 80px;
+            height: 125px;
+            background: #eee;
+            border-radius: 5px;
+            pointer-events: none;
+            opacity: 0.8;
+            font-size: 0.8em;
+
+            & path.domain {
+                visibility: hidden;
+            }
+
+            & .tick line {
+                color: #eee;
             }
         }
     }

@@ -15,16 +15,13 @@ import * as gparser from "gradient-parser";
 const GRADIENT_COLOR_VAR = "--map-gradient";
 const GRADIENT_DEFAULT = "linear-gradient(#4d342f 0%, #e4521b 22.5%, #decb45 42.5%, #a0a0a0 50%, #bccda8 57.5%, #42b3d5 67.5%, #1a237e 100%)";
 
-const defaultValueFn = d => d.cols[2];
-export const linearColorMap = (container, extent, valueFn = defaultValueFn) => {
+export const linearColorScale = (container, extent) => {
     const gradient = getGradient(container);
 
     const interpolator = multiInterpolator(gradient);
 
     const domain = [Math.min(extent.min, -extent.max), Math.max(-extent.min, extent.max)];
-    const scale = scaleSequential(interpolator).domain(domain);
-
-    return point => scale(valueFn(point));
+    return scaleSequential(interpolator).domain(domain);
 };
 
 const getGradient = container => {

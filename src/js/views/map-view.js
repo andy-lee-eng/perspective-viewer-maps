@@ -9,7 +9,9 @@
 
 import {createTooltip} from "../tooltip/tooltip";
 import {categoryColorMap} from "../style/categoryColors";
-import {linearColorMap} from "../style/linearColors";
+import {linearColorScale} from "../style/linearColors";
+
+import {showLegend, hideLegend} from "../legend/legend";
 
 const ol = window.ol;
 const {Map, View, Feature} = ol;
@@ -31,7 +33,9 @@ function mapView(container, config) {
     const extents = getDataExtents(data);
 
     const map = getOrCreateMap(container, extents);
-    const colorMap = extents.length > 2 ? linearColorMap(container, extents[2]) : categoryColorMap(container, data);
+    const useLinearColors = extents.length > 2;
+    const colorScale = useLinearColors ? linearColorScale(container, extents[2]) : null;
+    const colorMap = useLinearColors ? d => colorScale(d.cols[2]) : categoryColorMap(container, data);
     const sizeMap = sizeMapFromExtents(extents);
 
     map.vectorSource.clear();
@@ -39,6 +43,12 @@ function mapView(container, config) {
 
     // Update the tooltip component
     map.tooltip.config(config).data(data);
+
+    if (useLinearColors) {
+        showLegend(container, colorScale, extents[2]);
+    } else {
+        hideLegend(container);
+    }
 }
 
 mapView.resize = container => {
@@ -50,13 +60,16 @@ mapView.resize = container => {
 function featureFromPoint(point, colorMap, sizeMap) {
     const feature = new Feature(new Point(fromLonLat(point.cols)));
 
-    const rgb = colorMap(point).join(",");
-    const style = new CircleStyle({
-        stroke: new Stroke({color: `rgb(${rgb})`}),
-        fill: new Fill({color: `rgba(${rgb}, 0.5)`}),
-        radius: sizeMap(point)
-    });
-    feature.setStyle(new Style({image: style}));
+    const rgbColors = colorMap(point);
+    if (rgbColors) {
+        const rgb = rgbColors.join(",");
+        const style = new CircleStyle({
+            stroke: new Stroke({color: `rgb(${rgb})`}),
+            fill: new Fill({color: `rgba(${rgb}, 0.5)`}),
+            radius: sizeMap(point)
+        });
+        feature.setStyle(new Style({image: style}));
+    }
     return feature;
 }
 

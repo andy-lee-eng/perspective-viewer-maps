@@ -2426,12 +2426,12 @@ d3-array@1.0.1:
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-1.0.1.tgz#375c02874fcd96c16ed9f1bcf5b4a7be53f358e7"
   integrity sha1-N1wCh0/NlsFu2fG89bSnvlPzWOc=
 
-"d3-array@^1.2.0 || 2":
+"d3-array@^1.2.0 || 2", d3-array@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-2.0.3.tgz#9c0531eda701e416f28a030e3d4e6179ba74f19f"
   integrity sha512-C7g4aCOoJa+/K5hPVqZLG8wjYHsTUROTk7Z1Ep9F4P5l+WVrvV0+6nAZ1wKTRLMhFWpGbozxUpyjIPZYAaLi+g==
 
-d3-axis@1:
+d3-axis@1, d3-axis@^1.0.12:
   version "1.0.12"
   resolved "https://registry.yarnpkg.com/d3-axis/-/d3-axis-1.0.12.tgz#cdf20ba210cfbb43795af33756886fb3638daac9"
   integrity sha512-ejINPfPSNdGFKEOAtnBtdkpr24c4d4jsei6Lg98mxf424ivoDP2956/5HDpIAtmHo85lqT4pruy+zEgvRUBqaQ==
@@ -2627,7 +2627,7 @@ d3-scale@^3.0.0:
     d3-time "1"
     d3-time-format "2"
 
-d3-selection@1, d3-selection@^1.0.0, d3-selection@^1.0.2, d3-selection@^1.1.0:
+d3-selection@1, d3-selection@^1.0.0, d3-selection@^1.0.2, d3-selection@^1.1.0, d3-selection@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/d3-selection/-/d3-selection-1.4.0.tgz#ab9ac1e664cf967ebf1b479cc07e28ce9908c474"
   integrity sha512-EYVwBxQGEjLCKF2pJ4+yrErskDnz5v403qvAid96cNdCMr8rmCYfY5RGzWz24mdIbxmDf6/4EAH+K9xperD5jg==
