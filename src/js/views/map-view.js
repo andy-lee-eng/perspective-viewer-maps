@@ -12,6 +12,7 @@ import {categoryColorMap} from "../style/categoryColors";
 import {linearColorScale} from "../style/linearColors";
 import {showLegend, hideLegend} from "../legend/legend";
 import {computedStyle} from "../style/computed";
+import {categoryShapeMap} from "../style/categoryShapes";
 
 const ol = window.ol;
 const {Map, View, Feature} = ol;
@@ -21,9 +22,9 @@ const {fromLonLat} = ol.proj;
 const {Point} = ol.geom;
 const {Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
 
-const MIN_SIZE = 2;
-const MAX_SIZE = 20;
-const DEFAULT_SIZE = 5;
+const MIN_SIZE = 1;
+const MAX_SIZE = 10;
+const DEFAULT_SIZE = 2;
 const DEFAULT_TILE_URL = '"http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"';
 
 const PRIVATE = Symbol("map-view-data");
@@ -40,9 +41,10 @@ function mapView(container, config) {
     const colorScale = useLinearColors ? linearColorScale(container, extents[2]) : null;
     const colorMap = useLinearColors ? d => colorScale(d.cols[2]) : categoryColorMap(container, data);
     const sizeMap = sizeMapFromExtents(extents);
+    const shapeMap = config.column_pivot.length ? categoryShapeMap(container, data) : null;
 
     map.vectorSource.clear();
-    map.vectorSource.addFeatures(data.map(point => featureFromPoint(point, colorMap, sizeMap)));
+    map.vectorSource.addFeatures(data.map(point => featureFromPoint(point, colorMap, sizeMap, shapeMap)));
 
     // Update the tooltip component
     map.tooltip.config(config).data(data);
@@ -60,18 +62,34 @@ mapView.resize = container => {
     }
 };
 
-function featureFromPoint(point, colorMap, sizeMap) {
+function featureFromPoint(point, colorMap, sizeMap, shapeMap) {
     const feature = new Feature(new Point(fromLonLat(point.cols)));
+    const fillAndStroke = colorMap(point);
+    if (fillAndStroke) {
+        if (shapeMap) {
+            feature.setProperties({
+                category: point.category,
+                scale: sizeMap(point) / 4,
+                fill: fillAndStroke.fill,
+                stroke: fillAndStroke.stroke
+            });
 
-    const rgbColors = colorMap(point);
-    if (rgbColors) {
-        const rgb = rgbColors.join(",");
-        const style = new CircleStyle({
-            stroke: new Stroke({color: `rgb(${rgb})`}),
-            fill: new Fill({color: `rgba(${rgb}, 0.5)`}),
-            radius: sizeMap(point)
-        });
-        feature.setStyle(new Style({image: style}));
+            // Use custom shapes
+            feature.setStyle(shapeMap(point));
+        } else {
+            // Use simple circles
+            const style = new CircleStyle({
+                stroke: new Stroke({color: fillAndStroke.stroke}),
+                fill: new Fill({color: fillAndStroke.fill}),
+                radius: 2 * sizeMap(point)
+            });
+
+            feature.setStyle(
+                new Style({
+                    image: style
+                })
+            );
+        }
     }
     return feature;
 }

@@ -39,7 +39,7 @@ export function showLegend(container, colorScale, extent) {
         .merge(lines)
         .attr("y1", d => (d * height) / 100)
         .attr("y2", d => (d * height) / 100)
-        .attr("stroke", d => `rgb(${colorScale(((100 - d) * (extent.max - extent.min)) / 100 + extent.min)})`);
+        .attr("stroke", d => colorScale(((100 - d) * (extent.max - extent.min)) / 100 + extent.min).stroke);
 
     let maxLabelWidth = 0;
     legend.selectAll(".map-legend-axis .tick text").each((d, i, node) => {

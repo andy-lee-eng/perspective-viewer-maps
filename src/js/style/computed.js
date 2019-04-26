@@ -17,7 +17,11 @@ export const computedStyle = container => {
     }
 };
 
-export const asRgb = col => {
+export const toFillAndStroke = col => {
     const asColor = color(col);
-    return [asColor.r, asColor.g, asColor.b];
+    const stroke = `${asColor}`;
+    asColor.opacity = 0.5;
+    const fill = `${asColor}`;
+
+    return {stroke, fill};
 };

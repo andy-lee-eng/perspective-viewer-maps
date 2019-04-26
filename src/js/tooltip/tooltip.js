@@ -9,7 +9,7 @@
 
 const ol = window.ol;
 const {fromLonLat} = ol.proj;
-const {Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
+const {Icon, Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
 
 export function createTooltip(container, map, vectorSource) {
     let data = null;
@@ -17,6 +17,7 @@ export function createTooltip(container, map, vectorSource) {
     let currentPoint = null;
     let currentFeature = null;
     let featureStyle = null;
+    let featureProperties = null;
 
     map.on("pointermove", evt => {
         if (!evt.dragging) {
@@ -84,26 +85,38 @@ export function createTooltip(container, map, vectorSource) {
         currentFeature = vectorSource.getClosestFeatureToCoordinate(coordinate);
 
         if (currentFeature) {
+            featureProperties = currentFeature.getProperties();
             featureStyle = currentFeature.getStyle();
-            const imageStyle = featureStyle.getImage();
-            const color = imageStyle.getStroke().getColor();
-            const radius = imageStyle.getRadius();
 
-            const newStyle = new CircleStyle({
-                stroke: new Stroke({color: lightenRgb(color, 0.25)}),
-                fill: new Fill({color: lightenRgb(color, 0.5)}),
-                radius
-            });
-            currentFeature.setStyle(new Style({image: newStyle, zIndex: 10}));
+            const imageStyle = featureStyle && featureStyle.getImage();
+            if (featureStyle && imageStyle) {
+                const color = imageStyle.getStroke().getColor();
+
+                const newStyle = new CircleStyle({
+                    stroke: new Stroke({color: lightenRgb(color, 0.25)}),
+                    fill: new Fill({color: lightenRgb(color, 0.5)}),
+                    radius: imageStyle.getRadius()
+                });
+
+                currentFeature.setStyle(new Style({image: newStyle, zIndex: 10}));
+            } else {
+                const color = featureProperties.stroke;
+                currentFeature.setProperties({
+                    stroke: lightenRgb(color, 0.25),
+                    fill: lightenRgb(color, 0.5)
+                });
+            }
         }
     };
 
     const restoreFeature = () => {
         if (currentFeature && featureStyle) {
+            currentFeature.setProperties(featureProperties);
             currentFeature.setStyle(featureStyle);
         }
         currentFeature = null;
         featureStyle = null;
+        featureProperties = null;
     };
 
     const onLeave = () => {
@@ -193,10 +206,13 @@ export function createTooltip(container, map, vectorSource) {
     };
 
     const lightenRgb = (color, lighten) => {
-        const colors = color
-            .substring(color.indexOf("(") + 1)
-            .split(",")
-            .map(c => parseInt(c));
+        const fromString = color =>
+            color
+                .substring(color.indexOf("(") + 1)
+                .split(",")
+                .map(c => parseInt(c));
+
+        const colors = Array.isArray(color) ? color : fromString(color);
 
         const up = c => Math.floor(c + (255 - c) * lighten);
         return `rgb(${colors.map(up).join(",")})`;
