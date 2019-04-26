@@ -1,6 +1,6 @@
 {
   "name": "perspective-viewer-maps",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "main": "src/js/plugin/plugin.js",
   "files": [
     "build/**/*"
