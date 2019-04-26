@@ -7,17 +7,18 @@
  *
  */
 
-import {createTooltip} from "../tooltip/tooltip";
+import {getMapData, getDataExtents} from "../data/data";
+import {baseMap} from "./base-map";
 import {categoryColorMap} from "../style/categoryColors";
 import {linearColorScale} from "../style/linearColors";
 import {showLegend, hideLegend} from "../legend/legend";
-import {computedStyle} from "../style/computed";
 import {categoryShapeMap} from "../style/categoryShapes";
+import {lightenRgb} from "../style/computed";
 
 const ol = window.ol;
-const {Map, View, Feature} = ol;
-const {Tile: TileLayer, Vector: VectorLayer} = ol.layer;
-const {OSM, Vector: VectorSource} = ol.source;
+const {Vector: VectorLayer} = ol.layer;
+const {Vector: VectorSource} = ol.source;
+const {Feature} = ol;
 const {fromLonLat} = ol.proj;
 const {Point} = ol.geom;
 const {Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
@@ -25,17 +26,11 @@ const {Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
 const MIN_SIZE = 1;
 const MAX_SIZE = 10;
 const DEFAULT_SIZE = 2;
-const DEFAULT_TILE_URL = '"http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"';
-
-const PRIVATE = Symbol("map-view-data");
 
 function mapView(container, config) {
-    // Render the view of this data
     const data = getMapData(config);
     const extents = getDataExtents(data);
-
-    const map = getOrCreateMap(container, extents);
-    setTileUrl(container);
+    const map = baseMap(container);
 
     const useLinearColors = extents.length > 2;
     const colorScale = useLinearColors ? linearColorScale(container, extents[2]) : null;
@@ -43,11 +38,22 @@ function mapView(container, config) {
     const sizeMap = sizeMapFromExtents(extents);
     const shapeMap = config.column_pivot.length ? categoryShapeMap(container, data) : null;
 
-    map.vectorSource.clear();
-    map.vectorSource.addFeatures(data.map(point => featureFromPoint(point, colorMap, sizeMap, shapeMap)));
+    const vectorSource = new VectorSource({
+        features: data.map(point => featureFromPoint(point, colorMap, sizeMap, shapeMap)),
+        wrapX: false
+    });
+    baseMap.initialiseView(container, vectorSource);
+
+    const vectorLayer = new VectorLayer({source: vectorSource, updateWhileInteracting: true});
+    map.map.addLayer(vectorLayer);
 
     // Update the tooltip component
-    map.tooltip.config(config).data(data);
+    map.tooltip
+        .config(config)
+        .vectorSource(vectorSource)
+        .regions(false)
+        .onHighlight(onHighlight)
+        .data(data);
 
     if (useLinearColors) {
         showLegend(container, colorScale, extents[2]);
@@ -57,23 +63,24 @@ function mapView(container, config) {
 }
 
 mapView.resize = container => {
-    if (container[PRIVATE]) {
-        container[PRIVATE].map.updateSize();
-    }
+    baseMap.resize(container);
 };
 
 function featureFromPoint(point, colorMap, sizeMap, shapeMap) {
     const feature = new Feature(new Point(fromLonLat(point.cols)));
     const fillAndStroke = colorMap(point);
     if (fillAndStroke) {
-        if (shapeMap) {
-            feature.setProperties({
-                category: point.category,
-                scale: sizeMap(point) / 4,
+        feature.setProperties({
+            category: point.category,
+            scale: sizeMap(point) / 4,
+            style: {
                 fill: fillAndStroke.fill,
                 stroke: fillAndStroke.stroke
-            });
+            },
+            data: point
+        });
 
+        if (shapeMap) {
             // Use custom shapes
             feature.setStyle(shapeMap(point));
         } else {
@@ -94,6 +101,36 @@ function featureFromPoint(point, colorMap, sizeMap, shapeMap) {
     return feature;
 }
 
+function onHighlight(feature, highlighted) {
+    const featureProperties = feature.getProperties();
+    const featureStyle = feature.getStyle();
+    const imageStyle = featureStyle && featureStyle.getImage();
+
+    const oldStyle = featureProperties.oldStyle || featureProperties.style;
+
+    const style = highlighted
+        ? {
+              stroke: lightenRgb(oldStyle.stroke, 0.25),
+              fill: lightenRgb(oldStyle.stroke, 0.5)
+          }
+        : oldStyle;
+
+    if (featureStyle && imageStyle) {
+        const newStyle = new CircleStyle({
+            stroke: new Stroke({color: style.stroke}),
+            fill: new Fill({color: style.fill}),
+            radius: imageStyle.getRadius()
+        });
+
+        feature.setStyle(new Style({image: newStyle, zIndex: 10}));
+    } else {
+        feature.setProperties({
+            oldStyle,
+            style
+        });
+    }
+}
+
 function sizeMapFromExtents(extents) {
     if (extents.length > 3) {
         // We have the size value
@@ -101,95 +138,6 @@ function sizeMapFromExtents(extents) {
         return point => ((point.cols[3] - extents[3].min) / range) * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
     }
     return () => DEFAULT_SIZE;
-}
-
-function getMapData(config) {
-    const points = [];
-
-    // Enumerate through supplied data
-    config.data.forEach((row, i) => {
-        // Exclude "total" rows that don't have all values
-        const groupCount = row.__ROW_PATH__ ? row.__ROW_PATH__.length : 0;
-        if (groupCount < config.row_pivot.length) return;
-
-        // Get the group from the row path
-        const group = row.__ROW_PATH__ ? row.__ROW_PATH__.join("|") : `${i}`;
-        const rowPoints = {};
-
-        // Split the rest of the row into a point for each category
-        Object.keys(row)
-            .filter(key => key !== "__ROW_PATH__" && row[key] !== null)
-            .forEach(key => {
-                const split = key.split("|");
-                const category = split.length > 1 ? split.slice(0, split.length - 1).join("|") : "__default__";
-                rowPoints[category] = rowPoints[category] || {group, row};
-                rowPoints[category][split[split.length - 1]] = row[key];
-            });
-
-        // Add the points for this row to the data set
-        Object.keys(rowPoints).forEach(key => {
-            const rowPoint = rowPoints[key];
-            const cols = config.aggregate.map(a => rowPoint[a.column]);
-            points.push({
-                cols,
-                group: rowPoint.group,
-                row: rowPoint.row,
-                category: key
-            });
-        });
-    });
-
-    return points;
-}
-
-function getDataExtents(data) {
-    let extents = null;
-    data.forEach(point => {
-        if (!extents) {
-            extents = point.cols.map(c => ({min: c, max: c}));
-        } else {
-            extents = point.cols.map((c, i) => (c ? {min: Math.min(c, extents[i].min), max: Math.max(c, extents[i].max)} : extents[i]));
-        }
-    });
-    return extents;
-}
-
-function getOrCreateMap(container, extents) {
-    if (!container[PRIVATE]) {
-        const size = container.getBoundingClientRect();
-        const pExtents = [fromLonLat([extents[0].min, extents[1].min]), fromLonLat([extents[0].max, extents[1].max])];
-        const center = [(pExtents[0][0] + pExtents[1][0]) / 2, (pExtents[0][1] + pExtents[1][1]) / 2];
-        const resolution = Math.max(Math.abs(pExtents[1][0] - pExtents[0][0]) / size.width, Math.abs(pExtents[1][1] - pExtents[0][1]) / size.height);
-
-        const tileLayer = new TileLayer();
-        const vectorSource = new VectorSource({
-            features: [],
-            wrapX: false
-        });
-        const vectorLayer = new VectorLayer({source: vectorSource, updateWhileInteracting: true});
-
-
-        const map = new Map({
-            target: container,
-            layers: [tileLayer, vectorLayer],
-            view: new View({center, resolution})
-        });
-
-        const tooltip = createTooltip(container, map, vectorSource);
-        container[PRIVATE] = {map, vectorSource, tooltip, tileLayer, vectorLayer};
-    }
-
-    return container[PRIVATE];
-}
-
-function setTileUrl(container) {
-    const tileUrl = computedStyle(container)("--map-tile-url", DEFAULT_TILE_URL);
-    const url = tileUrl.substring(1, tileUrl.length - 1);
-
-    if (container[PRIVATE].tileUrl != url) {
-        container[PRIVATE].tileLayer.setSource(new OSM({wrapX: false, url}));
-        container[PRIVATE].tileUrl = url;
-    }
 }
 
 mapView.plugin = {

@@ -41,13 +41,13 @@ function categoryPointsMap(data, valueFn) {
 
 function createRenderer(categoryMap) {
     return (location, {context, feature}) => {
-        const {category, fill, stroke, scale} = feature.getProperties();
+        const {category, style, scale} = feature.getProperties();
         const points = categoryMap[category];
 
         var render = toContext(context);
 
-        const fillStyle = new Fill({color: fill});
-        const strokeStyle = new Stroke({color: stroke});
+        const fillStyle = new Fill({color: style.fill});
+        const strokeStyle = new Stroke({color: style.stroke});
         render.setFillStrokeStyle(fillStyle, strokeStyle);
 
         if (points.length) {

@@ -19,7 +19,6 @@
     
     <script src="/perspective.view.js"></script>
     <script src="/hypergrid.plugin.js"></script>
-    <script src="/highcharts.plugin.js"></script>
     <script src="/d3fc.plugin.js"></script>
     <script src="/template.plugin.js"></script>
 
@@ -54,12 +53,30 @@
 
 <body>
 
-    <perspective-viewer class="example" view="map_view" row-pivots='["name"]' columns='["longitude","latitude", "elevation"]'
+    <perspective-viewer class="example" view="map_regions" row-pivots='["region"]' columns='["elevation"]'
         aggregates='{"latitude":"avg","longitude":"avg","elevation":"avg"}' filters='[["elevation",">",0]]'>
 
     </perspective-viewer>
 
     <script>
+        registerMapRegions({
+            name: "unitaryAuthArea", 
+            url: "https://opendata.arcgis.com/datasets/254ac1e62df1482282395d4671dabee7_0.kml",
+            key: "ctyua19nm"
+        });
+
+        const regionMap = {
+            "Yorkshire and The Humber": "yh",
+            "East of England": "ee"
+        };
+        const regionNameFn = name => name.split(" ").map(w => w.substring(0, 1).toLowerCase()).join("");
+
+        registerMapRegions({
+            name: "region", 
+            url: "https://opendata.arcgis.com/datasets/4fcca2a47fed4bfaa1793015a18537ac_4.kml",
+            key: props => regionMap[props["rgn17nm"]] || regionNameFn(props["rgn17nm"])
+        });
+
         window.addEventListener('WebComponentsReady', function () {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', 'metSites.json', true);

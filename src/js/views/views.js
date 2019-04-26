@@ -8,6 +8,7 @@
  */
 
 import mapView from "./map-view";
+import regionView from "./region-view";
 
-const views = [mapView];
+const views = [mapView, regionView];
 export default views;

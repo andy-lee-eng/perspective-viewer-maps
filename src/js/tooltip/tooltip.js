@@ -7,17 +7,15 @@
  *
  */
 
-const ol = window.ol;
-const {fromLonLat} = ol.proj;
-const {Icon, Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
-
-export function createTooltip(container, map, vectorSource) {
+export function createTooltip(container, map) {
     let data = null;
     let config = null;
+    let vectorSource = null;
+    let regions = false;
+    let onHighlight = null;
+
     let currentPoint = null;
     let currentFeature = null;
-    let featureStyle = null;
-    let featureProperties = null;
 
     map.on("pointermove", evt => {
         if (!evt.dragging) {
@@ -49,74 +47,108 @@ export function createTooltip(container, map, vectorSource) {
         }
         return config;
     };
+    _tooltip.vectorSource = (...args) => {
+        if (args.length) {
+            vectorSource = args[0];
+            return _tooltip;
+        }
+        return vectorSource;
+    };
+    _tooltip.regions = (...args) => {
+        if (args.length) {
+            regions = args[0];
+            return _tooltip;
+        }
+        return regions;
+    };
+    _tooltip.onHighlight = (...args) => {
+        if (args.length) {
+            onHighlight = args[0];
+            return _tooltip;
+        }
+        return onHighlight;
+    };
 
     const onMove = evt => {
         // Find the closest point
         const {coordinate} = evt;
-        const closest = data.reduce((best, point) => {
-            const position = fromLonLat(point.cols);
-            const distance = distanceBetween(coordinate, position);
-            if (!best || distance < best.distance) {
-                return {distance, point, position};
+        const hoverFeature = getClosest(coordinate);
+        const closest = hoverFeature && hoverFeature.get("data");
+        if (closest) {
+            const geometry = hoverFeature.getGeometry();
+            const extent = geometry.getExtent();
+
+            const position = [(extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2];
+            const screen = map.getPixelFromCoordinate(position);
+
+            if (!regions) {
+                const mouse = map.getPixelFromCoordinate(coordinate);
+                if (distanceBetween(screen, mouse) > 50) {
+                    return onLeave(evt);
+                }
             }
-            return best;
-        }, null);
-        if (!closest) return;
 
-        const screen = map.getPixelFromCoordinate(closest.position);
-        const mouse = map.getPixelFromCoordinate(coordinate);
-        if (distanceBetween(screen, mouse) > 50) {
+            if (currentPoint !== closest) {
+                currentPoint = closest;
+                highlighFeature(hoverFeature);
+
+                tooltipDiv.innerHTML = composeHtml(currentPoint);
+                tooltipDiv.style.left = `${screen[0]}px`;
+                tooltipDiv.style.top = `${screen[1]}px`;
+                tooltipDiv.className = "map-tooltip show";
+            }
+        } else {
             return onLeave(evt);
-        }
-
-        if (currentPoint !== closest.point) {
-            currentPoint = closest.point;
-            highlighFeature(closest.position);
-
-            tooltipDiv.innerHTML = composeHtml(currentPoint);
-            tooltipDiv.style.left = `${screen[0]}px`;
-            tooltipDiv.style.top = `${screen[1]}px`;
-            tooltipDiv.className = "map-tooltip show";
         }
     };
 
-    const highlighFeature = coordinate => {
+    const getClosest = coordinate => {
+        if (regions) {
+            const hitFeatures = vectorSource.getFeaturesAtCoordinate(coordinate);
+            return hitFeatures.length ? hitFeatures[0] : null;
+        }
+        return vectorSource.getClosestFeatureToCoordinate(coordinate);
+    };
+
+    const highlighFeature = feature => {
         restoreFeature();
-        currentFeature = vectorSource.getClosestFeatureToCoordinate(coordinate);
+        currentFeature = feature;
 
-        if (currentFeature) {
-            featureProperties = currentFeature.getProperties();
-            featureStyle = currentFeature.getStyle();
+        if (currentFeature && onHighlight) {
+            onHighlight(currentFeature, true);
 
-            const imageStyle = featureStyle && featureStyle.getImage();
-            if (featureStyle && imageStyle) {
-                const color = imageStyle.getStroke().getColor();
+            // if (regions) {
+            // } else {
+            //     const imageStyle = featureStyle && featureStyle.getImage();
+            //     if (featureStyle && imageStyle) {
+            //         const color = imageStyle.getStroke().getColor();
 
-                const newStyle = new CircleStyle({
-                    stroke: new Stroke({color: lightenRgb(color, 0.25)}),
-                    fill: new Fill({color: lightenRgb(color, 0.5)}),
-                    radius: imageStyle.getRadius()
-                });
+            //         const newStyle = new CircleStyle({
+            //             stroke: new Stroke({color: lightenRgb(color, 0.25)}),
+            //             fill: new Fill({color: lightenRgb(color, 0.5)}),
+            //             radius: imageStyle.getRadius()
+            //         });
 
-                currentFeature.setStyle(new Style({image: newStyle, zIndex: 10}));
-            } else {
-                const color = featureProperties.stroke;
-                currentFeature.setProperties({
-                    stroke: lightenRgb(color, 0.25),
-                    fill: lightenRgb(color, 0.5)
-                });
-            }
+            //         currentFeature.setStyle(new Style({image: newStyle, zIndex: 10}));
+            //     } else {
+            //         const color = featureProperties.stroke;
+            //         currentFeature.setProperties({
+            //             stroke: lightenRgb(color, 0.25),
+            //             fill: lightenRgb(color, 0.5)
+            //         });
+            //     }
+            // }
         }
     };
 
     const restoreFeature = () => {
-        if (currentFeature && featureStyle) {
-            currentFeature.setProperties(featureProperties);
-            currentFeature.setStyle(featureStyle);
+        if (currentFeature && onHighlight) {
+            onHighlight(currentFeature, false);
+
+            // currentFeature.setProperties(featureProperties);
+            // currentFeature.setStyle(featureStyle);
         }
         currentFeature = null;
-        featureStyle = null;
-        featureProperties = null;
     };
 
     const onLeave = () => {
@@ -148,15 +180,15 @@ export function createTooltip(container, map, vectorSource) {
 
     const composeHtml = point => {
         const group = composeGroup(point.group);
-        const aggregates = composeAggregates(point.cols);
+        const aggregates = composeAggregates(point.cols, regions ? 0 : 2);
         const category = composeCategory(point.category);
-        const location = composeLocation(point.cols);
+        const location = regions ? "" : composeLocation(point.cols);
 
         return `${group}${aggregates}${category}${location}`;
     };
 
-    const composeAggregates = cols => {
-        const list = config.aggregate.slice(2).map((a, i) => ({name: a.column, value: cols[i + 2]}));
+    const composeAggregates = (cols, fromIndex) => {
+        const list = config.aggregate.slice(fromIndex).map((a, i) => ({name: a.column, value: cols[i + fromIndex].toLocaleString()}));
         return composeList(list);
     };
 
@@ -203,19 +235,6 @@ export function createTooltip(container, map, vectorSource) {
 
     const distanceBetween = (c1, c2) => {
         return Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2));
-    };
-
-    const lightenRgb = (color, lighten) => {
-        const fromString = color =>
-            color
-                .substring(color.indexOf("(") + 1)
-                .split(",")
-                .map(c => parseInt(c));
-
-        const colors = Array.isArray(color) ? color : fromString(color);
-
-        const up = c => Math.floor(c + (255 - c) * lighten);
-        return `rgb(${colors.map(up).join(",")})`;
     };
 
     return _tooltip;

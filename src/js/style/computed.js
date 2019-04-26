@@ -25,3 +25,16 @@ export const toFillAndStroke = col => {
 
     return {stroke, fill};
 };
+
+export const lightenRgb = (color, lighten) => {
+    const fromString = color =>
+        color
+            .substring(color.indexOf("(") + 1)
+            .split(",")
+            .map(c => parseInt(c));
+
+    const colors = Array.isArray(color) ? color : fromString(color);
+
+    const up = c => Math.floor(c + (255 - c) * lighten);
+    return `rgb(${colors.map(up).join(",")})`;
+};
