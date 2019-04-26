@@ -166,7 +166,8 @@ function getOrCreateMap(container, extents) {
             features: [],
             wrapX: false
         });
-        const vectorLayer = new VectorLayer({source: vectorSource});
+        const vectorLayer = new VectorLayer({source: vectorSource, updateWhileInteracting: true});
+
 
         const map = new Map({
             target: container,
