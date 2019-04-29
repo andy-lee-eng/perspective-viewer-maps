@@ -14,7 +14,7 @@ const ol = window.ol;
 const {Map, View} = ol;
 const {Tile: TileLayer} = ol.layer;
 const {OSM} = ol.source;
-const DEFAULT_TILE_URL = '"http://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"';
+const DEFAULT_TILE_URL = '"https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"';
 
 const PRIVATE = Symbol("map-view-data");
 
