@@ -20,9 +20,7 @@ const PRIVATE = Symbol("map-view-data");
 
 export function baseMap(container) {
     // Setup the initial base map
-    const map = getOrCreateMap(container);
-
-    return map;
+    return getOrCreateMap(container);
 }
 
 baseMap.resize = container => {

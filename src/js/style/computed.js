@@ -6,7 +6,7 @@
  * the Apache License 2.0.  The full license can be found in the LICENSE file.
  *
  */
-import {color} from "d3-color";
+import {color, rgb} from "d3-color";
 
 export const computedStyle = container => {
     if (window.ShadyCSS) {
@@ -26,15 +26,8 @@ export const toFillAndStroke = col => {
     return {stroke, fill};
 };
 
-export const lightenRgb = (color, lighten) => {
-    const fromString = color =>
-        color
-            .substring(color.indexOf("(") + 1)
-            .split(",")
-            .map(c => parseInt(c));
-
-    const colors = Array.isArray(color) ? color : fromString(color);
-
-    const up = c => Math.floor(c + (255 - c) * lighten);
-    return `rgb(${colors.map(up).join(",")})`;
+export const lightenRgb = (col, lighten) => {
+    const source = Array.isArray(col) ? rgb(col) : color(col);
+    const target = source.brighter(lighten);
+    return `${target}`;
 };

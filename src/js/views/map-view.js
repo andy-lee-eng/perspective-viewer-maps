@@ -36,7 +36,10 @@ function mapView(container, config) {
     const colorScale = useLinearColors ? linearColorScale(container, extents[2]) : null;
     const colorMap = useLinearColors ? d => colorScale(d.cols[2]) : categoryColorMap(container, data);
     const sizeMap = sizeMapFromExtents(extents);
-    const shapeMap = config.column_pivot.length ? categoryShapeMap(container, data) : null;
+
+    // Using the basic shapes seems to be performing very poorly
+    // const shapeMap = config.column_pivot.length ? categoryShapeMap(container, data) : null;
+    const shapeMap = categoryShapeMap(container, data);
 
     const vectorSource = new VectorSource({
         features: data.map(point => featureFromPoint(point, colorMap, sizeMap, shapeMap)),
@@ -141,7 +144,7 @@ function sizeMapFromExtents(extents) {
 }
 
 mapView.plugin = {
-    type: "map_view",
+    type: "map_points",
     name: "Map",
     max_size: 25000,
     initial: {

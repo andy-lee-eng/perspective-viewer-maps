@@ -40,18 +40,7 @@ function regionView(container, config) {
         const vectorLayer = new VectorLayer({
             source: vectorSource,
             updateWhileInteracting: true,
-            style: feature => {
-                const properties = feature.getProperties();
-                const regionName = regionSource.nameFn(properties);
-                const dataPoint = data.find(d => d.group == regionName);
-                if (dataPoint) {
-                    const style = colorScale(dataPoint.cols[0]);
-                    feature.setProperties({data: dataPoint, style});
-
-                    const drawStyle = properties.highlightStyle || style;
-                    return new Style({fill: new Fill({color: drawStyle.fill}), stroke: new Stroke({color: drawStyle.stroke})});
-                }
-            }
+            style: createStyleFunction(regionSource, data, colorScale)
         });
         map.map.addLayer(vectorLayer);
 
@@ -73,6 +62,21 @@ function regionView(container, config) {
     }
 }
 
+function createStyleFunction(regionSource, data, colorScale) {
+    return feature => {
+        const properties = feature.getProperties();
+        const regionName = regionSource.nameFn(properties);
+        const dataPoint = data.find(d => d.group == regionName);
+        if (dataPoint) {
+            const style = colorScale(dataPoint.cols[0]);
+            feature.setProperties({data: dataPoint, style});
+
+            const drawStyle = properties.highlightStyle || style;
+            return new Style({fill: new Fill({color: drawStyle.fill}), stroke: new Stroke({color: drawStyle.stroke})});
+        }
+    };
+}
+
 function onHighlight(feature, highlighted) {
     const featureProperties = feature.getProperties();
 
@@ -82,7 +86,7 @@ function onHighlight(feature, highlighted) {
     const style = highlighted
         ? {
               stroke: lightenRgb(oldStyle.stroke, 0.25),
-              fill: lightenRgb(oldStyle.stroke, 0.5)
+              fill: lightenRgb(oldStyle.fill, 0.25)
           }
         : null;
 
