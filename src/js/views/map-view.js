@@ -145,7 +145,7 @@ function sizeMapFromExtents(extents) {
 
 mapView.plugin = {
     type: "map_points",
-    name: "Map",
+    name: "Map Points",
     max_size: 25000,
     initial: {
         type: "number",

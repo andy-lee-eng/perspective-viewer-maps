@@ -53,7 +53,7 @@
 
 <body>
 
-    <perspective-viewer class="example" view="map_regions" row-pivots='["region"]' columns='["elevation"]'
+    <perspective-viewer class="example" view="map_points" row-pivots='["name"]' columns='["longitude", "latitude", "elevation"]'
         aggregates='{"latitude":"avg","longitude":"avg","elevation":"avg"}' filters='[["elevation",">",0]]'>
 
     </perspective-viewer>
