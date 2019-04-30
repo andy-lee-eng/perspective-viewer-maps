@@ -46,7 +46,7 @@ For example, if "Group By" is "Country", you'll need to register a map boundary 
 
 - **name** is the name of the parameter in the "Group By" field
 - **url** is the boundary data file to load
-- **key** is the name of the property in the boundary data that identifies the region - e.g. the country name in this example
+- **key** is the name of the property in the boundary data that identifies the region (e.g. the country name in this example), or a function that takes an array of feature parameters from file, and returns a value to match to the data group. Using a function is useful if the feature names don't match the data group, and some translation is required.
 - **format** (optional) specifies the format for loading the features. Defaults to KML, which is:
 
 ```
