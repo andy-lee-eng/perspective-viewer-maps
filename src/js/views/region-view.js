@@ -72,6 +72,10 @@ function createStyleFunction(regionSource, data, colorScale) {
 
             const drawStyle = properties.highlightStyle || style;
             return new Style({fill: new Fill({color: drawStyle.fill}), stroke: new Stroke({color: drawStyle.stroke})});
+        } else {
+            // Mark it with a name so we can identify it in a tooltip
+            feature.setProperties({data: {group: regionName}});
+            return new Style({stroke: new Stroke({color: "rgba(200, 150, 150, 0.2)"})});
         }
     };
 }

@@ -81,10 +81,30 @@
     </perspective-viewer>
 
     <script>
+        const areaMap = {
+            "City of London": "Greater London",
+            "Herefordshire, County of": "Herefordshire",
+            "Rhondda Cynon Taf": "Rhondda Cynon Taff",
+            "County Durham": "Durham",
+            "Midlothian": "Midlothian Council",
+            "City of Edinburgh": "Edinburgh",
+            "Glasgow City": "Glasgow",
+            "Dundee City": "Dundee",
+            "Aberdeen City": "Aberdeen",
+            "Merseyside": "Liverpool",
+            "Manchester": "Greater Manchester",
+            "Leeds": "West Yorkshire",
+            "Sheffield": "South Yorkshire",
+            "Kingston upon Hull, City of": "Kingston upon Hull",
+            "Birmingham": "West Midlands Conurbation",
+            "Bournemouth, Christchurch and Poole": "Bournemouth",
+            "Bristol, City of": "Bristol"
+        };
+
         registerMapRegions({
             name: "unitaryAuthArea", 
             url: "https://opendata.arcgis.com/datasets/254ac1e62df1482282395d4671dabee7_0.kml",
-            key: "ctyua19nm"
+            key: props => areaMap[props["ctyua19nm"]] || props["ctyua19nm"]
         });
 
         const regionMap = {

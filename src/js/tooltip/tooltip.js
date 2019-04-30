@@ -188,6 +188,7 @@ export function createTooltip(container, map) {
     };
 
     const composeAggregates = (cols, fromIndex) => {
+        if (!cols) return "";
         const list = config.aggregate.slice(fromIndex).map((a, i) => ({name: a.column, value: cols[i + fromIndex].toLocaleString()}));
         return composeList(list);
     };
@@ -205,7 +206,7 @@ export function createTooltip(container, map) {
     };
 
     const getListFromJoin = (join, pivot) => {
-        if (pivot.length) {
+        if (join && pivot.length) {
             const values = join.split("|");
             return values.map((value, i) => ({name: pivot[i], value}));
         }
