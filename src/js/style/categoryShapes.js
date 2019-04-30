@@ -44,7 +44,7 @@ function createRenderer(categoryMap) {
         const {category, style, scale} = feature.getProperties();
         const points = categoryMap[category];
 
-        var render = toContext(context);
+        var render = toContext(context, {pixelRatio: 1});
 
         const fillStyle = new Fill({color: style.fill});
         const strokeStyle = new Stroke({color: style.stroke});

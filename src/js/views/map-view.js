@@ -21,7 +21,6 @@ const {Vector: VectorSource} = ol.source;
 const {Feature} = ol;
 const {fromLonLat} = ol.proj;
 const {Point} = ol.geom;
-const {Circle: CircleStyle, Style, Fill, Stroke} = ol.style;
 
 const MIN_SIZE = 1;
 const MAX_SIZE = 10;
@@ -36,9 +35,6 @@ function mapView(container, config) {
     const colorScale = useLinearColors ? linearColorScale(container, extents[2]) : null;
     const colorMap = useLinearColors ? d => colorScale(d.cols[2]) : categoryColorMap(container, data);
     const sizeMap = sizeMapFromExtents(extents);
-
-    // Using the basic shapes seems to be performing very poorly
-    // const shapeMap = config.column_pivot.length ? categoryShapeMap(container, data) : null;
     const shapeMap = categoryShapeMap(container, data);
 
     const vectorSource = new VectorSource({
@@ -47,7 +43,7 @@ function mapView(container, config) {
     });
     baseMap.initialiseView(container, vectorSource);
 
-    const vectorLayer = new VectorLayer({source: vectorSource, updateWhileInteracting: true});
+    const vectorLayer = new VectorLayer({source: vectorSource, updateWhileInteracting: true, renderMode: "image"});
     map.map.addLayer(vectorLayer);
 
     // Update the tooltip component
@@ -83,32 +79,14 @@ function featureFromPoint(point, colorMap, sizeMap, shapeMap) {
             data: point
         });
 
-        if (shapeMap) {
-            // Use custom shapes
-            feature.setStyle(shapeMap(point));
-        } else {
-            // Use simple circles
-            const style = new CircleStyle({
-                stroke: new Stroke({color: fillAndStroke.stroke}),
-                fill: new Fill({color: fillAndStroke.fill}),
-                radius: 2 * sizeMap(point)
-            });
-
-            feature.setStyle(
-                new Style({
-                    image: style
-                })
-            );
-        }
+        // Use custom shapes
+        feature.setStyle(shapeMap(point));
     }
     return feature;
 }
 
 function onHighlight(feature, highlighted) {
     const featureProperties = feature.getProperties();
-    const featureStyle = feature.getStyle();
-    const imageStyle = featureStyle && featureStyle.getImage();
-
     const oldStyle = featureProperties.oldStyle || featureProperties.style;
 
     const style = highlighted
@@ -118,20 +96,10 @@ function onHighlight(feature, highlighted) {
           }
         : oldStyle;
 
-    if (featureStyle && imageStyle) {
-        const newStyle = new CircleStyle({
-            stroke: new Stroke({color: style.stroke}),
-            fill: new Fill({color: style.fill}),
-            radius: imageStyle.getRadius()
-        });
-
-        feature.setStyle(new Style({image: newStyle, zIndex: 10}));
-    } else {
-        feature.setProperties({
-            oldStyle,
-            style
-        });
-    }
+    feature.setProperties({
+        oldStyle,
+        style
+    });
 }
 
 function sizeMapFromExtents(extents) {

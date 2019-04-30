@@ -36,7 +36,6 @@ function regionView(container, config) {
     if (regionSource) {
         const vectorSource = regionSource.source;
         const colorScale = linearColorScale(container, extents[0]);
-        console.log(extents[0]);
         const vectorLayer = new VectorLayer({
             source: vectorSource,
             updateWhileInteracting: true,
