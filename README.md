@@ -20,7 +20,7 @@ or with npm:
 
 It uses [OpenLayers](https://openlayers.org/) and [OpenStreetMap](https://www.openstreetmap.org/#map=13/51.1366/-3.6823) to display data as a map view.
 
-This project was built as an example for the blog article [Perspective Plugin API - How to build a new plugin](https://blog.scottlogic.com/2019/04/23/perspective-plugin-api-how-to-build-a-new-plugin.html);
+See the "making-of" blog article [Perspective Plugin API - How to build a new plugin](https://blog.scottlogic.com/2019/04/23/perspective-plugin-api-how-to-build-a-new-plugin.html);
 
 ## Point maps
 
@@ -31,6 +31,8 @@ The "Map Points" view requires a "Longitude" and "Latitude" parameter to show th
 ## Region maps
 
 The "Map Regions" view doesn't need coordinates, but requires a boundary map to associate with the data. It matches the "group" to the region and color codes the region.
+
+![Map Regions Example](img/map-regions-example.png)
 
 For example, if "Group By" is "Country", you'll need to register a map boundary source with the command:
 
@@ -53,8 +55,6 @@ For example, if "Group By" is "Country", you'll need to register a map boundary 
 ```
 
 See the OpenLayers documentation for more information about [FeatureFormat](https://openlayers.org/en/latest/apidoc/module-ol_format_Feature-FeatureFormat.html)
-
-![Map Regions Example](img/map-regions-example.png)
 
 ## Themes
 
