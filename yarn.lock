@@ -801,6 +801,83 @@
     "@d3fc/d3fc-rebind" "^5.0.6"
     d3-array "^1.0.0"
 
+"@finos/perspective-viewer-d3fc@latest":
+  version "0.3.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@finos/perspective-viewer-d3fc/-/perspective-viewer-d3fc-0.3.0-rc.1.tgz#98e43d4985a25c1b263af729ad29edff8b06fa57"
+  integrity sha512-jLdP2Q7RlgxY2ZvCOzHX5es9YrxvF2vump9kTsJbmqXwRe2qbaetAzRPyHywwKt5eKsU8npPrN2w6X8JjSbrVg==
+  dependencies:
+    "@finos/perspective" "^0.3.0-rc.1"
+    "@finos/perspective-viewer" "^0.3.0-rc.1"
+    babel-runtime "^6.26.0"
+    chroma-js "^1.3.4"
+    d3 "^5.7.0"
+    d3-svg-legend "^2.25.6"
+    d3fc "^14.0.34"
+    gradient-parser "0.1.5"
+
+"@finos/perspective-viewer-highcharts@latest":
+  version "0.3.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@finos/perspective-viewer-highcharts/-/perspective-viewer-highcharts-0.3.0-rc.1.tgz#56ceca102bcd96833827c60c5c836afed6b764dc"
+  integrity sha512-a0hEZwt/FTvvkZrS9aEVYWe6ta7gUsz3gxfZKpQN89ERDIJyWiNCX7piZ90PAyEn0AGtGN8+eKQ8yN3p7td4Fg==
+  dependencies:
+    "@babel/runtime" "^7.3.4"
+    "@finos/perspective" "^0.3.0-rc.1"
+    "@finos/perspective-viewer" "^0.3.0-rc.1"
+    chroma-js "^1.3.4"
+    detectie "1.0.0"
+    gradient-parser "0.1.5"
+    highcharts "6.1.0"
+    highcharts-grouped-categories "1.1.2"
+    highcharts-more "^0.1.2"
+
+"@finos/perspective-viewer-hypergrid@latest":
+  version "0.3.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@finos/perspective-viewer-hypergrid/-/perspective-viewer-hypergrid-0.3.0-rc.1.tgz#71633d80f100e6f23e63542a93c5f2917aa1f102"
+  integrity sha512-ZEYSUach9IV1DucifjFoXXplh5+IryAZAlvph7NU2z6cgco5okhsqu7IEyhYwdcGwlNXPHg/fBU231rR57DRNA==
+  dependencies:
+    "@babel/runtime" "^7.3.4"
+    "@finos/perspective" "^0.3.0-rc.1"
+    "@finos/perspective-viewer" "^0.3.0-rc.1"
+    datasaur-local "3.0.0"
+    fin-hypergrid "3.2.0"
+    fin-hypergrid-grouped-header-plugin "^1.2.4"
+    lodash "^4.17.4"
+    rectangular "1.0.1"
+    superscript-number "^1.0.0"
+
+"@finos/perspective-viewer@^0.3.0-rc.1", "@finos/perspective-viewer@latest":
+  version "0.3.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@finos/perspective-viewer/-/perspective-viewer-0.3.0-rc.1.tgz#e076093d7e80cd58f6adc34bf9086619859ff83d"
+  integrity sha512-DAodKdAPDAm3pekbzEnllzib3HY94RYOKJzmixK6ywJp4ohznsCRXnK24zrKXf/u1hgRQ1RuHUi0Q124EnZuvA==
+  dependencies:
+    "@babel/runtime" "^7.3.4"
+    "@finos/perspective" "^0.3.0-rc.1"
+    "@webcomponents/shadycss" "^1.5.2"
+    "@webcomponents/webcomponentsjs" "~2.0.4"
+    awesomplete "^1.1.2"
+    d3-array "^1.2.1"
+    detectie "1.0.0"
+    lodash "^4.17.4"
+    mobile-drag-drop "^2.2.0"
+
+"@finos/perspective@^0.3.0-rc.1", "@finos/perspective@latest":
+  version "0.3.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@finos/perspective/-/perspective-0.3.0-rc.1.tgz#e4c6cf8d68de524d044b85a4bd8d6056619e9bb9"
+  integrity sha512-EnlnFGvA6MEa7zh88LQ5Au+KlKyKSe1DNvUmo206rynMGHP17Xe5dZXWL2SXf73Hjz8fbNemmqIn5cwQGm4o2g==
+  dependencies:
+    "@babel/runtime" "^7.3.4"
+    bufferutil "~3.0.0"
+    d3-array "^1.2.1"
+    detectie "1.0.0"
+    flatbuffers "^1.10.2"
+    lodash "^4.17.4"
+    moment "^2.19.1"
+    papaparse "^4.3.6"
+    text-encoding-utf-8 "^1.0.2"
+    tslib "^1.9.3"
+    websocket-heartbeat-js "^1.0.7"
+    ws "^6.1.2"
+
 "@jest/console@^24.3.0":
   version "24.3.0"
   resolved "https://registry.yarnpkg.com/@jest/console/-/console-24.3.0.tgz#7bd920d250988ba0bf1352c4493a48e1cb97671e"
@@ -937,83 +1014,6 @@
   dependencies:
     "@types/istanbul-lib-coverage" "^1.1.0"
     "@types/yargs" "^12.0.9"
-
-"@jpmorganchase/perspective-viewer-d3fc@^0.2.21":
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/@jpmorganchase/perspective-viewer-d3fc/-/perspective-viewer-d3fc-0.2.21.tgz#09e640d58dbcf631322bd6d265420ccb1e6e36b4"
-  integrity sha512-nseamURjUijyjJdrStLh4cdJB5b3JpTK1rBDcMVcCSRtBMYeVv9+P0ZliylJFksAcT5uyDUA6n58s3/zmNMWzg==
-  dependencies:
-    "@jpmorganchase/perspective" "^0.2.21"
-    "@jpmorganchase/perspective-viewer" "^0.2.21"
-    babel-runtime "^6.26.0"
-    chroma-js "^1.3.4"
-    d3 "^5.7.0"
-    d3-svg-legend "^2.25.6"
-    d3fc "^14.0.34"
-    gradient-parser "0.1.5"
-
-"@jpmorganchase/perspective-viewer-highcharts@^0.2.21":
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/@jpmorganchase/perspective-viewer-highcharts/-/perspective-viewer-highcharts-0.2.21.tgz#c61fdc10fd143aeed6716e9da09b081af11debf1"
-  integrity sha512-0FaMuUeVh7o6UUH5Tr4BagtYAT4WXMEZgNcPWqR0OUOXOTRtlCdMdKrQgd0ZlM6kGSpFWel67GNS6Wgp8x5Kyg==
-  dependencies:
-    "@babel/runtime" "^7.3.4"
-    "@jpmorganchase/perspective" "^0.2.21"
-    "@jpmorganchase/perspective-viewer" "^0.2.21"
-    chroma-js "^1.3.4"
-    detectie "1.0.0"
-    gradient-parser "0.1.5"
-    highcharts "6.1.0"
-    highcharts-grouped-categories "1.1.2"
-    highcharts-more "^0.1.2"
-
-"@jpmorganchase/perspective-viewer-hypergrid@^0.2.21":
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/@jpmorganchase/perspective-viewer-hypergrid/-/perspective-viewer-hypergrid-0.2.21.tgz#0f0cbac5db25cdf04284fff5339e4d6d805f9111"
-  integrity sha512-Gg35h9Oor1RYgXOBRbVnkn+4HqdNSOZVvwq9P0FpYJkbtCo8yQDR+1SydaIAPhBSLXXtA3XroNdY523CB4Bt2w==
-  dependencies:
-    "@babel/runtime" "^7.3.4"
-    "@jpmorganchase/perspective" "^0.2.21"
-    "@jpmorganchase/perspective-viewer" "^0.2.21"
-    datasaur-local "3.0.0"
-    fin-hypergrid "3.2.0"
-    fin-hypergrid-grouped-header-plugin "^1.2.4"
-    lodash "^4.17.4"
-    rectangular "1.0.1"
-    superscript-number "^1.0.0"
-
-"@jpmorganchase/perspective-viewer@^0.2.21":
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/@jpmorganchase/perspective-viewer/-/perspective-viewer-0.2.21.tgz#8c42fa56711db5b3d53c6fcb04518e0935decd21"
-  integrity sha512-FwmPBUpOUVQC06EAH/XCzYwoI9SHe4VJqn5IibaWmymnHl2WIIRO6eNF0nSrScJnJrjnO6nPCT7T79+YmRXMyQ==
-  dependencies:
-    "@babel/runtime" "^7.3.4"
-    "@jpmorganchase/perspective" "^0.2.21"
-    "@webcomponents/shadycss" "^1.5.2"
-    "@webcomponents/webcomponentsjs" "~2.0.4"
-    awesomplete "^1.1.2"
-    d3-array "^1.2.1"
-    detectie "1.0.0"
-    lodash "^4.17.4"
-    mobile-drag-drop "^2.2.0"
-
-"@jpmorganchase/perspective@^0.2.21":
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/@jpmorganchase/perspective/-/perspective-0.2.21.tgz#8515705205d532435e65c2b926081cc9617f3311"
-  integrity sha512-3gCHNtFvyFzysZrQ4bD1RiWRzdesMduN1bm3XKg8fJSk4sJJdoDBQ5hiI2IKL/SJjY4HhIApaDOWbPRr9Q9Bvg==
-  dependencies:
-    "@babel/runtime" "^7.3.4"
-    bufferutil "~3.0.0"
-    d3-array "^1.2.1"
-    detectie "1.0.0"
-    flatbuffers "^1.10.2"
-    lodash "^4.17.4"
-    moment "^2.19.1"
-    papaparse "^4.3.6"
-    text-encoding-utf-8 "^1.0.2"
-    tslib "^1.9.3"
-    websocket-heartbeat-js "^1.0.7"
-    ws "^6.1.2"
 
 "@types/babel__core@^7.1.0":
   version "7.1.0"

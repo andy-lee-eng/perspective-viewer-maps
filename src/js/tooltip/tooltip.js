@@ -159,7 +159,7 @@ export function createTooltip(container, map) {
 
     const onClick = () => {
         if (currentPoint) {
-            const column_names = config.aggregate.map(a => a.column);
+            const column_names = config.columns;
             const groupFilters = getFilter(getListFromJoin(currentPoint.group, config.row_pivot));
             const categoryFilters = getFilter(getListFromJoin(currentPoint.category, config.column_pivot));
             const filters = config.filter.concat(groupFilters).concat(categoryFilters);
@@ -189,7 +189,7 @@ export function createTooltip(container, map) {
 
     const composeAggregates = (cols, fromIndex) => {
         if (!cols) return "";
-        const list = config.aggregate.slice(fromIndex).map((a, i) => ({name: a.column, value: cols[i + fromIndex].toLocaleString()}));
+        const list = config.columns.slice(fromIndex).map((c, i) => ({name: c, value: cols[i + fromIndex].toLocaleString()}));
         return composeList(list);
     };
 

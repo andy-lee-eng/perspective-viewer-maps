@@ -33,7 +33,7 @@ export function getMapData(config) {
         // Add the points for this row to the data set
         Object.keys(rowPoints).forEach(key => {
             const rowPoint = rowPoints[key];
-            const cols = config.aggregate.map(a => rowPoint[a.column]);
+            const cols = config.columns.map(c => rowPoint[c]);
             points.push({
                 cols,
                 group: rowPoint.group,

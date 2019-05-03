@@ -14,8 +14,8 @@
     "lint": "eslint src/**/*.js"
   },
   "dependencies": {
-    "@jpmorganchase/perspective": "^0.2.21",
-    "@jpmorganchase/perspective-viewer": "^0.2.21",
+    "@finos/perspective": "latest",
+    "@finos/perspective-viewer": "latest",
     "d3": "^5.9.2",
     "gradient-parser": "^0.1.5",
     "less": "^3.9.0",
@@ -26,9 +26,9 @@
     "@babel/plugin-proposal-decorators": "^7.3.0",
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.3.1",
-    "@jpmorganchase/perspective-viewer-d3fc": "^0.2.21",
-    "@jpmorganchase/perspective-viewer-highcharts": "^0.2.21",
-    "@jpmorganchase/perspective-viewer-hypergrid": "^0.2.21",
+    "@finos/perspective-viewer-d3fc": "latest",
+    "@finos/perspective-viewer-highcharts": "latest",
+    "@finos/perspective-viewer-hypergrid": "latest",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.1.0",
     "babel-loader": "^8.0.5",

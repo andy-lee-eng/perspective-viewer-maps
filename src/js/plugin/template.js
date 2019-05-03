@@ -7,7 +7,7 @@
  *
  */
 
-import {bindTemplate} from "@jpmorganchase/perspective-viewer/cjs/js/utils";
+import {bindTemplate} from "@finos/perspective-viewer/cjs/js/utils";
 import style from "../../less/plugin.less";
 import {name} from "../../../package.json";
 
